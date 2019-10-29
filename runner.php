@@ -2,24 +2,44 @@
 
 use App\Manager;
 
+echo "\n\n\n\n\n\n";
+
+//Your task is to implement an Integer Stack class which implements transactional behaviour and
+// supports nested transactions. Nested transaction allow to open another transaction scope
+// while a transaction scopes is already open. When committing or rolling back only the latest transaction
+//scope is applied or discarded.
+
 $manager = new Manager();
 $manager->push(10);     // immediately pushed, because transaction is not started
 
-//$manager->commit();             // does nothing, because transaction is not started
-//
-//$manager->begin();
-//$manager->push(1);      // push is only enqueued
-//$manager->push(2);
-//$manager->push(3);
-//$manager->pop();
-//
-//$manager->begin();              // new nested transaction
+$manager->commit();             // does nothing, because transaction is not started
+
+$manager->begin();
+$manager->push(1);      // push is only enqueued
+$manager->push(2);
+$manager->push(3);
+$manager->pop();
+
+$manager->begin();              // new nested transaction
 $manager->push(5);
-//$manager->push(6);
+$manager->push(6);
 
 $manager->commit();
+echo $manager->top(), "\n";     // it should have 10, 5 and 6
 
-var_dump($manager->top());
+$manager->commit();
+echo $manager->top(), "\n";     // it should have 10, 5, 6, 1, 2
+
+$manager->begin();              // new transaction
+$manager->push(7);
+$manager->push(8);
+$manager->rollback();
+
+echo $manager->top(), "\n";     // it should still have 10, 5, 6, 1, 2
+
+echo $manager->pop(), "\n";     // 2 was popped from the stack
+
+echo $manager->top(), "\n";     // it should still have 10, 5, 6, 1
 
 function __autoload($className)
 {

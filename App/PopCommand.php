@@ -11,13 +11,17 @@ class PopCommand
         $this->numbers = $numbers;
     }
 
-    public function execute(): bool
+    /**
+     * Removes the top-most value from the stack and returns it.
+     *
+     * @return int|null
+     */
+    public function execute(): ?int
     {
         if ($this->numbers->count()) {
-            $this->numbers->pop();
-            return true;
+            return $this->numbers->pop();
         }
-        return false;
+        return null;
     }
 
 }

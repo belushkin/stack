@@ -13,10 +13,14 @@ class PushCommand
         $this->numbers = $numbers;
     }
 
-    public function execute(): bool
+    /**
+     * Adding an item on the top of the stack
+     *
+     * @return void
+     */
+    public function execute(): void
     {
         $this->numbers->push($this->numberToPush);
-        return true;
     }
 
 }

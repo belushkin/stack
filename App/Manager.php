@@ -13,14 +13,24 @@ class Manager
         $this->numbers = new Stack();
     }
 
-    public function begin()
+    /**
+     * Starts the scope of the transaction
+     *
+     * @return void
+     */
+    public function begin(): void
     {
         $transaction = new Transaction();
         $transaction->start();
         $this->transactions->push($transaction);
     }
 
-    public function rollback()
+    /**
+     * Discards the changes from the current transaction scope
+     *
+     * @return bool
+     */
+    public function rollback(): bool
     {
         if ($this->transactions->count() > 0) {
             $transaction = $this->transactions->pop();
@@ -32,7 +42,12 @@ class Manager
         return false;
     }
 
-    public function commit()
+    /**
+     * Applies the changes from the current transaction scope
+     *
+     * @return void
+     */
+    public function commit(): void
     {
         if ($this->transactions->count() > 0) {
             $transaction = $this->transactions->pop();
@@ -42,7 +57,12 @@ class Manager
         }
     }
 
-    public function push(Int $number)
+    /**
+     * Adding an item on the top of the stack
+     *
+     * @return void
+     */
+    public function push(Int $number): void
     {
         if ($this->transactions->count() > 0) {
             $transaction = $this->transactions->top();
@@ -55,27 +75,38 @@ class Manager
         }
     }
 
-    public function top()
+    /**
+     * Returns the actual stack of numbers
+     *
+     * @return Stack
+     */
+    public function top(): ?Stack
     {
         if ($this->numbers->count() > 0) {
-            return $this->numbers->peek();
+            return $this->numbers; // ->peek();
         }
-        return 0;
+        return null;
     }
 
-    public function pop()
+    /**
+     * Removes the top-most value from the stack and returns it.
+     *
+     * @return int|null
+     */
+    public function pop(): ?int
     {
         if ($this->transactions->count() > 0) {
             $transaction = $this->transactions->top();
             if ($transaction != null) {
                 $popCommand = new PopCommand($this->numbers);
-                $transaction->getCommands()->enqueue($popCommand);
+                return $transaction->getCommands()->enqueue($popCommand);
             }
         } else {
             if ($this->numbers->count() > 0) {
-                $this->numbers->pop();
+                return $this->numbers->pop();
             }
         }
+        return null;
     }
 
 }
