@@ -1,4 +1,4 @@
-# stack
+# Transactional Stack
 
 This challenge implemented using 1 main Stack class which implements 2 interfaces: 
 - StackInterface
@@ -32,7 +32,7 @@ Challenge was structured like this:
 
 In order to check the implementation of the App execute
 
-```php php runner.php``` 
+```php runner.php``` 
 
 Main php file print tooltips to the STDOUT so you can analyze it's implementation.
 
