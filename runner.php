@@ -1,6 +1,6 @@
 <?php
 
-use App\Manager;
+use App\Stack;
 
 echo "\n\n\n\n\n\n";
 
@@ -9,37 +9,37 @@ echo "\n\n\n\n\n\n";
 // while a transaction scopes is already open. When committing or rolling back only the latest transaction
 //scope is applied or discarded.
 
-$manager = new Manager();
-$manager->push(10);     // immediately pushed, because transaction is not started
+$stack = new Stack();
+$stack->push(10);     // immediately pushed, because transaction is not started
 
-$manager->commit();             // does nothing, because transaction is not started
+$stack->commit();             // does nothing, because transaction is not started
 
-$manager->begin();
-$manager->push(1);      // push is only enqueued
-$manager->push(2);
-$manager->push(3);
-$manager->pop();
+$stack->start();
+$stack->push(1);      // push is only enqueued
+$stack->push(2);
+$stack->push(3);
+$stack->pop();
 
-$manager->begin();              // new nested transaction
-$manager->push(5);
-$manager->push(6);
+$stack->start();              // new nested transaction
+$stack->push(5);
+$stack->push(6);
 
-$manager->commit();
-echo $manager->top(), "\n";     // it should have 10, 5 and 6
+$stack->commit();
+echo $stack->top(), "\n";     // it should have 10, 5 and 6
 
-$manager->commit();
-echo $manager->top(), "\n";     // it should have 10, 5, 6, 1, 2
+$stack->commit();
+echo $stack->top(), "\n";     // it should have 10, 5, 6, 1, 2
 
-$manager->begin();              // new transaction
-$manager->push(7);
-$manager->push(8);
-$manager->rollback();
+$stack->start();              // new transaction
+$stack->push(7);
+$stack->push(8);
+$stack->rollback();
 
-echo $manager->top(), "\n";     // it should still have 10, 5, 6, 1, 2
+echo $stack->top(), "\n";     // it should still have 10, 5, 6, 1, 2
 
-echo $manager->pop(), "\n";     // 2 was popped from the stack
+echo $stack->pop(), "\n";     // 2 was popped from the stack
 
-echo $manager->top(), "\n";     // it should still have 10, 5, 6, 1
+echo $stack->top(), "\n";     // it should still have 10, 5, 6, 1
 
 function __autoload($className)
 {

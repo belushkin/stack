@@ -3,65 +3,128 @@
 namespace App;
 
 use App\StackInterface;
+use App\TransactionableInterface;
 
-/**
- * A stack is a data structure which allows for ordered management of a collection of similar data types.
- * It is defined as a LIFO (last-in first out) data structure so items which have been added last,
- * are removed first from the collection.
- *
- */
-class Stack implements StackInterface {
+class Stack implements StackInterface, TransactionableInterface
+{
+    private $transactions;
+    private $numbers;
 
-    private $stack = [];
+    public function __construct()
+    {
+        $this->transactions = new \SplStack();
+        $this->numbers = new Stack();
+    }
+
+    /**
+     * Starts the scope of the transaction
+     *
+     * @return void
+     */
+    public function start(): void
+    {
+        $transaction = new Transaction();
+        $transaction->start();
+        $this->transactions->push($transaction);
+    }
+
+    /**
+     * Discards the changes from the current transaction scope
+     *
+     * @return bool
+     */
+    public function rollback(): bool
+    {
+        if ($this->transactions->count() > 0) {
+            $transaction = $this->transactions->pop();
+            if ($transaction != null) {
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * Applies the changes from the current transaction scope
+     *
+     * @return bool
+     */
+    public function commit(): bool
+    {
+        if ($this->transactions->count() > 0) {
+            $transaction = $this->transactions->pop();
+            if ($transaction != null) {
+                return $transaction->commit();
+            }
+        }
+        return true;
+    }
 
     /**
      * Adding an item on the top of the stack
      *
-     * @param int $value
+     * @param Int $number
+     * @return void
      */
-    public function push(int $value): void
+    public function push(Int $number): void
     {
-        $this->stack[] = $value;
+        if ($this->transactions->count() > 0) {
+            $transaction = $this->transactions->top();
+            if ($transaction != null) {
+                $pushCommand = new PushCommand($number, $this->numbers);
+                $transaction->getCommands()->enqueue($pushCommand);
+            }
+        } else {
+            $this->numbers->push($number);
+        }
     }
 
     /**
-     * Removes the top-most value from the stack and returns it.
+     * Returns the actual stack of numbers
      *
-     * @return int
+     * @return Stack
      */
-    public function pop(): int
+    public function top(): ?Stack
     {
-        return array_pop($this->stack);
+        if ($this->numbers->count() > 0) {
+            return $this->numbers;
+        }
+        return null;
     }
 
     /**
-     * Returns the top-most value from the stack.
+     * Returns the actual stack of numbers
      *
      * @return int
      */
     public function peek(): int
     {
-        return end(array_values($this->stack));
+        if ($this->numbers->count() > 0) {
+            return $this->numbers->peek();
+        }
+        return 0;
     }
 
     /**
-     * Returns count of values from the stack.
+     * Removes the top-most value from the stack and returns it.
      *
-     * @return int
+     * @return int|null
      */
-    public function count(): int
+    public function pop(): int
     {
-        return count($this->stack);
-    }
-
-    /**
-     * Returns string representation of the stack
-     *
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return implode(", ", $this->stack);
+        if ($this->transactions->count() > 0) {
+            $transaction = $this->transactions->top();
+            if ($transaction != null) {
+                $popCommand = new PopCommand($this->numbers);
+                return $transaction->getCommands()->enqueue($popCommand);
+            }
+        } else {
+            if ($this->numbers->count() > 0) {
+                return $this->numbers->pop();
+            }
+        }
+        return 0;
     }
 
 }
