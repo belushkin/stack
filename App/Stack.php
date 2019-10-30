@@ -13,7 +13,7 @@ class Stack implements StackInterface, TransactionableInterface
     public function __construct()
     {
         $this->transactions = new \SplStack();
-        $this->numbers = new Stack();
+        $this->numbers = new \SplStack();
     }
 
     /**
@@ -83,14 +83,18 @@ class Stack implements StackInterface, TransactionableInterface
     /**
      * Returns the actual stack of numbers
      *
-     * @return Stack
+     * @return array
      */
-    public function top(): ?Stack
+    public function top(): array
     {
-        if ($this->numbers->count() > 0) {
-            return $this->numbers;
+        $result = [];
+        $this->numbers->rewind();
+
+        while($this->numbers->valid()) {
+            $result[] = $this->numbers->current();
+            $this->numbers->next();
         }
-        return null;
+        return $result;
     }
 
     /**
@@ -101,7 +105,7 @@ class Stack implements StackInterface, TransactionableInterface
     public function peek(): int
     {
         if ($this->numbers->count() > 0) {
-            return $this->numbers->peek();
+            return $this->numbers->top();
         }
         return 0;
     }

@@ -7,7 +7,7 @@ class PushCommand
     private $numberToPush;
     private $numbers;
 
-    public function __construct(Int $numberToPush, Stack $numbers)
+    public function __construct(Int $numberToPush, \SplStack $numbers)
     {
         $this->numberToPush = $numberToPush;
         $this->numbers = $numbers;

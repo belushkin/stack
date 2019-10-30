@@ -6,7 +6,7 @@ class PopCommand
 {
     private $numbers;
 
-    public function __construct(Stack $numbers)
+    public function __construct(\SplStack $numbers)
     {
         $this->numbers = $numbers;
     }

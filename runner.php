@@ -18,28 +18,28 @@ $stack->start();
 $stack->push(1);      // push is only enqueued
 $stack->push(2);
 $stack->push(3);
-$stack->pop();
+$stack->pop();                // 3 popped from the stack
 
 $stack->start();              // new nested transaction
 $stack->push(5);
 $stack->push(6);
 
 $stack->commit();
-echo $stack->top(), "\n";     // it should have 10, 5 and 6
+
+echo $stack->peek(), "               -> top element\n";
+echo implode(", ", $stack->top()), "        -> it should have 6, 5 and 10\n";     // it should have 6, 5 and 10
 
 $stack->commit();
-echo $stack->top(), "\n";     // it should have 10, 5, 6, 1, 2
+echo implode(", ", $stack->top()), "  -> it should have 2, 1, 6, 5, 10\n";     // it should have 2, 1, 6, 5, 10
 
 $stack->start();              // new transaction
 $stack->push(7);
 $stack->push(8);
 $stack->rollback();
 
-echo $stack->top(), "\n";     // it should still have 10, 5, 6, 1, 2
-
-echo $stack->pop(), "\n";     // 2 was popped from the stack
-
-echo $stack->top(), "\n";     // it should still have 10, 5, 6, 1
+echo implode(", ", $stack->top()), "  -> it should still have 2, 1, 6, 5, 10\n";     // it should still have 2, 1, 6, 5, 10
+$stack->pop();
+echo implode(", ", $stack->top()), "     -> 2 was popped from the stack, it should have 1, 6, 5, 10\n\n";     // 2 was popped from the stack, it should have 1, 6, 5, 10
 
 function __autoload($className)
 {
